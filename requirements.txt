@@ -1,0 +1,31 @@
+# Core dependencies for SuperNan
+
+# System
+ffmpeg
+
+# Video/Audio processing
+opencv-python
+librosa
+
+# AI/ML - Speech Recognition
+faster-whisper
+openai-whisper
+
+# AI/ML - Translation
+transformers
+sentencepiece
+accelerate
+torch
+
+# AI/ML - Text to Speech
+edge-tts
+TTS
+
+# AI/ML - Lip Sync
+gdown
+gfpgan
+
+# Utilities
+numpy
+pandas
+
