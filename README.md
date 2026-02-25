@@ -1,18 +1,29 @@
-# SuperNan - Video Dubbing & Lip Sync Project
+# 🔄 SuperNan
 
-A powerful video dubbing and lip-syncing pipeline that translates videos from English to Hindi with realistic voice cloning and automatic lip synchronization.
+<div align="center">
+
+
+_A powerful video dubbing and lip-syncing pipeline that translates videos from English to Hindi with realistic voice cloning and automatic lip synchronization._
+
+</div>
+
+---
 
 ## Features
 
-- **Video Chunk Extraction**: Extract specific segments from longer videos
-- **Audio Extraction**: Pull audio tracks from video files
-- **Speech Recognition**: Transcribe audio to English using Faster Whisper (medium model)
-- **Machine Translation**: Translate English text to Hindi using Facebook's NLLB-200 distilled model
-- **Voice Synthesis**: Generate natural Hindi speech using Edge TTS (SwaraNeural voice)
-- **Duration Matching**: Adjust synthesized speech duration to match original audio
-- **Lip Synchronization**: Replace original audio with translated audio while preserving video
+| Feature                    | Description                                      |
+| -------------------------- | ------------------------------------------------ |
+| **Video Extraction**    | Extract specific segments from longer videos     |
+|  **Audio Extraction**    | Pull audio tracks from video files               |
+| **Speech Recognition**  | Transcribe audio to English using Faster Whisper |
+| **Machine Translation** | Translate English text to Hindi using NLLB-200   |
+|  **Voice Synthesis**     | Generate natural Hindi speech using Edge TTS     |
+| **Duration Matching**   | Adjust speech duration to match original audio   |
+|  **Lip Sync**            | Replace original audio with translated audio     |
 
-## Project Structure
+---
+
+## 📁 Project Structure
 
 ```
 SuperNan/
@@ -26,38 +37,44 @@ SuperNan/
 │   ├── video_processor.py # Video extraction utilities
 │   ├── audio_processor.py # Audio manipulation utilities
 │   ├── transcriber.py     # Speech-to-text (Whisper)
-│   ├── translator.py       # Translation (NLLB)
+│   ├── translator.py      # Translation (NLLB)
 │   ├── tts.py             # Text-to-Speech (Edge TTS)
 │   └── pipeline.py        # Complete dubbing pipeline
 ```
 
-## Installation
+---
 
-### System Dependencies
+## Quick Start
 
-```bash
-apt-get update -y
-apt-get install -y ffmpeg
-```
-
-### Python Dependencies
+### Installation
 
 ```bash
+# System dependencies
+apt-get update -y && apt-get install -y ffmpeg
+
+# Install Python packages
 pip install -r requirements.txt
 ```
 
-## Usage
-
-### Option 1: Using CLI
+### Usage
 
 ```bash
-# Run with default settings (English → Hindi)
+# Run with default settings
 python main.py --input input.mp4 --output final_output.mp4
 
 # Specify custom time range
 python main.py --input input.mp4 --output final.mp4 --start 00:01:00 --end 00:01:30
+```
 
-# Use complete pipeline mode
+---
+
+## Detailed Usage
+
+### Option 1: Using CLI
+
+```bash
+python main.py --input input.mp4 --output final_output.mp4
+python main.py --input input.mp4 --output final.mp4 --start 00:01:00 --end 00:01:30
 python main.py --input input.mp4 --use-pipeline
 ```
 
@@ -110,87 +127,102 @@ match_audio_duration("audio.wav", "hindi_speech.wav", "adjusted_hindi.wav")
 merge_audio_video("chunk.mp4", "adjusted_hindi.wav", "final_output.mp4")
 ```
 
-### Option 4: Using Individual Services
-
-```python
-# Transcription Service
-from src import TranscriptionService
-
-transcriber = TranscriptionService(model_size="medium")
-result = transcriber.transcribe("audio.wav", task="translate")
-print(result["text"])  # English transcript
-
-# Translation Service
-from src import TranslationService
-
-translator = TranslationService()
-hindi_text = translator.translate_to_hindi("Hello, how are you?")
-
-# TTS Service
-from src import TTSService
-
-tts = TTSService(voice="hi-IN-SwaraNeural")
-tts.generate_speech("नमस्ते, कैसे हैं आप?", "output.wav")
-```
+---
 
 ## Pipeline Overview
 
 ```
-Input Video (input.mp4)
-       │
-       ▼
-┌──────────────────┐
-│ Extract Chunk    │ ──► chunk.mp4
-│ (00:00:15-30)    │
-└──────────────────┘
-       │
-       ▼
-┌──────────────────┐
-│ Extract Audio    │ ──► audio.wav
-└──────────────────┘
-       │
-       ▼
-┌──────────────────┐
-│ Whisper (EN)    │ ──► English Transcript
-└──────────────────┘
-       │
-       ▼
-┌──────────────────┐
-│ NLLB (EN→HI)     │ ──► Hindi Text
-└──────────────────┘
-       │
-       ▼
-┌──────────────────┐
-│ Edge TTS (HI)   │ ──► hindi_speech.wav
-└──────────────────┘
-       │
-       ▼
-┌──────────────────┐
-│ Duration Adjust  │ ──► adjusted_hindi.wav
-└──────────────────┘
-      ┌────────────────── │
-       ▼
-┐
-│ Merge + Output   │ ──► final_output.mp4
-└──────────────────┘
+┌─────────────────────────────────────────────────────────────────┐
+│                        INPUT VIDEO                               │
+│                      input.mp4 (RAW)                            │
+└─────────────────────────────────────────────────────────────────┘
+                                │
+                                ▼
+┌─────────────────────────────────────────────────────────────────┐
+│  STEP 1: Extract Chunk                                        │
+│  ffmpeg -i input.mp4 -ss 00:00:15 -to 00:00:30 -c copy          │
+└─────────────────────────────────────────────────────────────────┘
+                                │ chunk.mp4
+                                ▼
+┌─────────────────────────────────────────────────────────────────┐
+│   STEP 2: Extract Audio                                        │
+│  ffmpeg -i chunk.mp4 -q:a 0 -map a audio.wav                     │
+└─────────────────────────────────────────────────────────────────┘
+                                │ audio.wav
+                                ▼
+┌─────────────────────────────────────────────────────────────────┐
+│  STEP 3: Transcription (Whisper)                            │
+│  Audio → English Text                                            │
+└─────────────────────────────────────────────────────────────────┘
+                                │ "Hello everyone..."
+                                ▼
+┌─────────────────────────────────────────────────────────────────┐
+│  STEP 4: Translation (NLLB-200)                             │
+│  English → Hindi                                                 │
+└─────────────────────────────────────────────────────────────────┘
+                                │ "नमस्ते सभी को..."
+                                ▼
+┌─────────────────────────────────────────────────────────────────┐
+│  STEP 5: Text-to-Speech (Edge TTS)                          │
+│  Hindi Text → Hindi Audio                                       │
+└─────────────────────────────────────────────────────────────────┘
+                                │ hindi_speech.wav
+                                ▼
+┌─────────────────────────────────────────────────────────────────┐
+│  STEP 6: Duration Adjustment                                 │
+│  Match original audio duration                                  │
+└─────────────────────────────────────────────────────────────────┘
+                                │ adjusted_hindi.wav
+                                ▼
+┌─────────────────────────────────────────────────────────────────┐
+│  STEP 7: Merge + Output                                      │
+│  ffmpeg -i chunk.mp4 -i adjusted_hindi.wav                      │
+└─────────────────────────────────────────────────────────────────┘
+                                │
+                                ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                     FINAL OUTPUT                              │
+│                   final_output.mp4                               │
+└─────────────────────────────────────────────────────────────────┘
 ```
+
+---
 
 ## Models Used
 
-| Component          | Model                            | Description                      |
-| ------------------ | -------------------------------- | -------------------------------- |
-| Speech Recognition | Faster Whisper (medium)          | Multilingual ASR model           |
-| Translation        | facebook/nllb-200-distilled-600M | 600M parameter distilled model   |
-| Text-to-Speech     | Edge TTS (hi-IN-SwaraNeural)     | Microsoft Edge neural voice      |
-| Lip Sync           | Wav2Lip                          | Audio-driven lip synchronization |
+| Component             | Model                                                                                | Description               |
+| --------------------- | ------------------------------------------------------------------------------------ | ------------------------- |
+| Speech Recognition | [Faster Whisper](https://github.com/SYSTRAN/faster-whisper) (medium)                 | Multilingual ASR model    |
+| Translation        | [NLLB-200](https://huggingface.co/facebook/nllb-200-distilled-600M) (distilled-600M) | Meta's multilingual model |
+| Text-to-Speech     | [Edge TTS](https://github.com/rany2/edge-tts) (hi-IN-SwaraNeural)                    | Microsoft neural voice    |
+| Lip Sync           | [Wav2Lip](https://github.com/Rudrabha/Wav2Lip)                                       | Audio-driven lip sync     |
+
+---
 
 ## Requirements
 
-- Python 3.8+
-- CUDA-capable GPU (recommended for faster inference)
-- ffmpeg installed on system
-- At least 8GB RAM for model loading
+- **Python**: 3.8+
+- **GPU**: CUDA-capable (recommended for faster inference)
+- **System**: ffmpeg
+- **RAM**: At least 8GB for model loading
 
-## License
+---
 
-MIT License
+## Dependencies
+
+```
+ffmpeg                    # System dependency
+opencv-python           # Video processing
+librosa                 # Audio analysis
+faster-whisper          # Speech recognition
+transformers           # ML models
+sentencepiece           # Tokenization
+accelerate              # Model acceleration
+torch                   # Deep learning
+edge-tts               # Text-to-speech
+TTS                    # Voice cloning
+gdown                  # File downloads
+gfpgan                 # Face restoration
+```
+
+
